@@ -7,7 +7,8 @@ import { delUserById, getUserById, getUsers, patchUserById, postNewUser, putUser
 const app = express();
 app.use(express.json());
 
-const PORT = process.env.PORT;
+// const PORT = process.env.PORT;
+const PORT = 5001;
 
 
 
