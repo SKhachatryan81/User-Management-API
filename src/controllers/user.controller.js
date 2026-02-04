@@ -1,5 +1,6 @@
 import express from "express"
 import usersService from "../services/user.service.js"
+import userHelper from "../lib/user.helper.js";
 
 class UserController {
 
@@ -8,7 +9,13 @@ class UserController {
         try
         {
             const users = await usersService.getAllUsers();
-            res.json(users);
+            if(!users || users.length === 0)
+            {
+                const error = new Error("Users not found");
+                error.status = 404;
+                throw error;
+            }
+            return res.json(users);
         }catch(err)
         {
             next(err);
@@ -19,9 +26,15 @@ class UserController {
     {
         try
         {
-            const id = req.params.id;
+            const id = Number(req.params.id);
             const user = await usersService.getUserById(id);
-            res.json(user);
+            if(!user)
+            {
+                const error = new Error("User not found");
+                error.status = 404;
+                throw error;
+            }
+            return res.json(user);
         }catch(err)
         {
             next(err);
@@ -32,8 +45,14 @@ class UserController {
     {
         try
         {
-            await usersService.postNewUser(req.body);
-            res.status(200).send("new user created\n");
+            const newUser = await usersService.postNewUser(req.body);
+            if(!newUser)
+            {
+                const error = new Error("Failed to create a new user");
+                error.status = 500;
+                throw error;
+            }
+            return res.status(201).send("new user created\n");
         }catch(err)
         {
             next(err);
@@ -44,9 +63,15 @@ class UserController {
     {
         try
         {
-            const id = req.params.id;
-            await usersService.deleteUserById(id);
-            res.status(200).send("user deleted");
+            const id = Number(req.params.id);
+            const userDeleted = await usersService.deleteUserById(id);
+            if(!userDeleted)
+            {
+                const error = new Error("Failed to delete a user");
+                error.status = 500;
+                throw error;
+            }
+            return res.status(200).send("user deleted");
         }catch(err)
         {
             next(err);
@@ -58,9 +83,21 @@ class UserController {
         try
         {
             const updates = req.body;
-            const id = req.params.id;
+            if(!userHelper.allFieldsFilledValidator(updates))
+            {
+                const error = new Error("Missing required fields");
+                error.status = 400;
+                throw error;
+            }
+            const id = Number(req.params.id);
             const result =  await usersService.patchUserById(updates, id);
-            res.status(200).send(result);
+            if(!result)
+            {
+                const error = new Error("Failed to patch");
+                error.status = 500;
+                throw error;
+            }
+            return res.status(200).send(result);
         }catch(err)
         {
             next(err);
@@ -72,9 +109,21 @@ class UserController {
         try
         {
             const updates = req.body;
-            const id = req.params.id;
+            if(!userHelper.allFieldsFilledValidator(updates))
+            {
+                const error = new Error("Missing required fields");
+                error.status = 400;
+                throw error;
+            }
+            const id = Number(req.params.id);
             const result = await usersService.putUserById(updates, id);
-            res.status(200).send(result);
+            if(!result)
+            {
+                const error = new Error("Failed to put");
+                error.status = 500;
+                throw error;
+            }
+            return res.status(200).send(result);
         }catch(err)
         {
             next(err);

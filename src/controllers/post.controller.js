@@ -7,8 +7,14 @@ class PostController {
     async postNewPost(req, res, next)
     {
         try{
-            await PostService.createNewPost(req.body);
-            res.status(200).send("new post created\n");
+            const newPost = await PostService.createNewPost(req.body);
+            if(!newPost)
+            {
+                const error = new Error("Failed to create a new post");
+                error.status = 500;
+                throw error;
+            }
+            return res.status(200).send("new post created\n");
         }catch(err)
         {
             next(err);
@@ -19,7 +25,13 @@ class PostController {
     {
         try{
             const result = await PostService.getAllPosts();
-            res.status(200).send(result);
+            if(!result || result.length === 0)
+            {
+                const error = new Error("Post not found");
+                error.status = 404;
+                throw error;
+            }
+            return res.status(200).send(result);
         }catch(err)
         {
             next(err);
@@ -29,9 +41,15 @@ class PostController {
     async getPostByid(req, res, next)
     {
         try{
-            const id = req.params.id;
+            const id = Number(req.params.id);
             const result = await PostService.getPostById(id);
-            res.status(200).send(result);
+            if(!result)
+            {
+                const error = new Error("Post not found");
+                error.status = 404;
+                throw error;
+            }
+            return res.status(200).send(result);
         }catch(err)
         {
             next(err);
@@ -43,7 +61,14 @@ class PostController {
         try{
             const id = Number(req.params.id);
             const result = await PostService.deletePostById(id);
-            res.status(200).send("post deleted");
+            if(!result)
+            {
+                const error = new Error("Failed to delete");
+                error.status = 500;
+                throw error;
+            }
+            
+            return res.status(200).send("post deleted");
         }catch(err)
         {
             next(err);
@@ -55,7 +80,13 @@ class PostController {
         try{
             const id = Number(req.params.id);
             const result = await PostService.patchPostById(req.body, id);
-            res.status(200).send(result);
+            if(!result)
+            {
+                const error = new Error("Failed to patch");
+                error.status = 500;
+                throw error;
+            }
+            return res.status(200).send(result);
         }catch(err)
         {
             next(err);
@@ -67,7 +98,13 @@ class PostController {
         try{
             const id = Number(req.params.id);
             const result = await PostService.putPostById(req.body, id);
-            res.status(200).send(result);
+            if(!result)
+            {
+                const error = new Error("Failed to put");
+                error.status = 500;
+                throw error;
+            }
+            return res.status(200).send(result);
         }catch(err)
         {
             next(err);

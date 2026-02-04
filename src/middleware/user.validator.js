@@ -76,6 +76,23 @@ class UserValidator{
             next(err);
         }
     }
+
+    async properParameters(req, res, next)
+    {
+        try{
+            const id = Number(req.params.id);
+            if(isNaN(id))
+            {
+                const error = new Error("Invalid ID parameter");
+                error.status = 400;
+                throw error;
+            }
+            return next();
+        }catch(err)
+        {
+            next(err);
+        }
+    }
 }
 
 export default new UserValidator();
