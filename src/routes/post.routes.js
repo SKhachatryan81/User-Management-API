@@ -2,35 +2,33 @@ import express from "express";
 import postsController from "../controllers/post.controller.js";
 import postValidator from "../middleware/post.validator.js";
 
-const postsRouter = express.Router();
+const postRouter = express.Router();
 
-postsRouter.post("/",
+postRouter.post("/me",
     postValidator.userExistsValidator,
     postsController.postNewPost
 );
 
-postsRouter.get("/", postsController.getAllPosts);
+postRouter.get("/", postsController.getAllPosts);
 
-postsRouter.get("/:id",
-    postValidator.properParameters,
-    postsController.getPostByid
+postRouter.get("/me",
+    postsController.getPostsByUserId
 );
 
-postsRouter.delete("/:id",
+postRouter.delete("/me/:id",
     postValidator.properParameters,
     postsController.deletePostById
 );
 
-postsRouter.patch("/:id",
+postRouter.patch("/me/:id",
     postValidator.properParameters,
     postValidator.useridChangeValidator,
     postsController.patchPostById
 );
 
-postsRouter.put("/:id",
-    postValidator.properParameters,
+postRouter.put("/me/:id",
     postValidator.useridChangeValidator,
     postsController.putPostById
 );
 
-export default postsRouter;
+export default postRouter;

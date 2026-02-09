@@ -1,9 +1,7 @@
-class UserHelper {
+class Helper {
 
-    allFieldsFilledValidator(data)
+    checkFields(data, requiredFields)
     {
-        const requiredFields =[ "name", "age", "occupation", "email", "username"];
-
         const update = data;
         for(const key of requiredFields)
         {
@@ -17,4 +15,4 @@ class UserHelper {
     }
 }
 
-export default new UserHelper();
+export default new Helper();

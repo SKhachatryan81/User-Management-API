@@ -1,58 +1,29 @@
 import { db } from "../config/index.js"
+import helper from "../lib/helper.js"
 
 class UserValidator{
-
-    async uniqueValidator(req, res, next)
-    {
-        try{
-            
-            const username = req.body.username;
-            const email = req.body.email;
-
-            const user1 = await db.userModel.findOne({
-                where: { username }
-            });
-            const user2 = await db.userModel.findOne({
-                where: { email }
-            });
-
-            if(user1)
-            {
-                return res.status(400).json({ok: false, message: "username already in use"});
-            }
-            if(user2)
-            {
-                return res.status(400).json({ok: false, message: "email already in use"});
-            }
-
-            next();
-
-        }catch(err)
-        {
-            next(err);
-        }
-    }
-
+    
     async allFieldsFilledValidator(req, res, next)
     {
         try{
-            const requiredFields =[ "name", "age", "occupation", "email", "username"];
+            const requiredFields =[ "name", "age", "username", "email", "password"];
 
             const update = req.body;
-            for(const key of requiredFields)
+            const fields = helper.checkFields(update, requiredFields);
+            if(!fields)
             {
-                if(update[key] === undefined || update[key] == null || update[key].toString().trim() === "")
-                {
-                    return res.status(400).json({ok: false, message: "no field must remain empty"})
-                }
+                const error = new Error("no field must remain empty");
+                error.status = 400;
+                throw error;
             }
-            next()
+            return next()
 
         }catch(err)
         {
             next(err);
         }
     }
+
 
     async allFieldsEmptyValidator(req, res, next)
     {

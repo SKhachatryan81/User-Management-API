@@ -7,14 +7,17 @@ class PostController {
     async postNewPost(req, res, next)
     {
         try{
-            const newPost = await PostService.createNewPost(req.body);
+            const userId = req.user.userId;
+            const {title, content } = req.body;
+            const payload = {user_id: userId, title: title, content: content}
+            const newPost = await PostService.createNewPost(payload);
             if(!newPost)
             {
                 const error = new Error("Failed to create a new post");
                 error.status = 500;
                 throw error;
             }
-            return res.status(200).send("new post created\n");
+            return res.status(200).send({ok: true, message: "new post created"});
         }catch(err)
         {
             next(err);
@@ -38,11 +41,11 @@ class PostController {
         }
     }
 
-    async getPostByid(req, res, next)
+    async getPostsByUserId(req, res, next)
     {
         try{
-            const id = Number(req.params.id);
-            const result = await PostService.getPostById(id);
+            const userId = req.user.userId;
+            const result = await PostService.getPostsByUserId(userId);
             if(!result)
             {
                 const error = new Error("Post not found");
@@ -59,8 +62,9 @@ class PostController {
     async deletePostById(req, res, next)
     {
         try{
-            const id = Number(req.params.id);
-            const result = await PostService.deletePostById(id);
+            const userId = req.user.userId;
+            const postId = Number(req.params.id);
+            const result = await PostService.deletePostById(userId, postId);
             if(!result)
             {
                 const error = new Error("Failed to delete");
@@ -68,7 +72,7 @@ class PostController {
                 throw error;
             }
             
-            return res.status(200).send("post deleted");
+            return res.status(200).send({ok: true, message: "post deleted"});
         }catch(err)
         {
             next(err);
@@ -78,8 +82,10 @@ class PostController {
     async patchPostById(req, res, next)
     {
         try{
-            const id = Number(req.params.id);
-            const result = await PostService.patchPostById(req.body, id);
+            const userId = req.user.userId;
+            const postId = Number(req.params.id);
+            const update = req.body;
+            const result = await PostService.patchPostById(update, userId, postId);
             if(!result)
             {
                 const error = new Error("Failed to patch");
@@ -96,8 +102,10 @@ class PostController {
     async putPostById(req, res, next)
     {
         try{
-            const id = Number(req.params.id);
-            const result = await PostService.putPostById(req.body, id);
+            const userId = req.user.userId;
+            const postId = Number(req.params.id);
+            const update = req.body;
+            const result = await PostService.putPostById(update, userId, postId);
             if(!result)
             {
                 const error = new Error("Failed to put");

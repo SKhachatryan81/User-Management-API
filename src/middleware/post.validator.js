@@ -5,9 +5,9 @@ class PostValidator {
     async userExistsValidator(req, res, next)
     {
         try{
-            const user_id = Number(req.body.user_id);
+            const userId = req.user.userId;
             const user = await db.userModel.findOne({
-                where: {id: user_id}
+                where: {id: userId}
             });
 
             if(!user)

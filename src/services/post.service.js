@@ -13,31 +13,57 @@ class PostService {
         return await db.postModel.findAll();
     }
 
-    async getPostById(id)
+    async getPostById(postId)
     {
-        const post = await db.postModel.findByPk(id);
+        const post = await db.postModel.findByPk(postId);
         if(!post)
         {
-            throw new Error("post not found");
+            const error = new Error("post not found");
+            error.status = 404;
+            throw error;
         }
         return post;
     }
 
-    async deletePostById(id)
+    async getPostsByUserId(userId)
     {
-        const post = await this.getPostById(id);
+        const posts = await db.postModel.findAll({where: {user_id: userId}});
+        if(posts.length === 0)
+        {
+            const error = new Error("post(s) not found");
+            error.status = 404;
+            throw error;
+        }
+        return posts;
+    }
 
+    async deletePostById(userId, postId)
+    {
+        const post = await this.getPostById(postId);
+        if(post.user_id !== userId)
+        {
+            const error = new Error("post not found");
+            error.status = 404;
+            throw error;
+        }
         return await post.destroy();
     }
 
-    async patchPostById(update, id)
+    async patchPostById(update, userId, postId)
     {
         if ('user_id' in update) 
         {
             delete update.user_id;
         }
 
-        const post = await this.getPostById(id);
+
+        const post = await this.getPostById(postId);
+        if(post.user_id !== userId)
+        {
+            const error = new Error("post not found");
+            error.status = 404;
+            throw error;
+        }
 
         for(const key in update)
         {
@@ -50,14 +76,20 @@ class PostService {
         return post.update(update);
     }
 
-    async putPostById(update, id)
+    async putPostById(update, userId, postId)
     {
         if ('user_id' in update) 
         {
             delete update.user_id;
         }
 
-        const post = await this.getPostById(id);
+        const post = await this.getPostById(postId);
+        if(post.user_id !== userId)
+        {
+            const error = new Error("post not found");
+            error.status = 404;
+            throw error;
+        }
 
         const requiredFileds = ["title", "content"];
         for(const key of requiredFileds)

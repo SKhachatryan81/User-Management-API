@@ -1,6 +1,8 @@
 import express from "express"
 import usersService from "../services/user.service.js"
-import userHelper from "../lib/user.helper.js";
+import userHelper from "../lib/helper.js";
+import helper from "../lib/helper.js";
+import userValidator from "../middleware/user.validator.js";
 
 class UserController {
 
@@ -26,7 +28,7 @@ class UserController {
     {
         try
         {
-            const id = Number(req.params.id);
+            const id = req.user.userId;
             const user = await usersService.getUserById(id);
             if(!user)
             {
@@ -63,7 +65,7 @@ class UserController {
     {
         try
         {
-            const id = Number(req.params.id);
+            const id = req.user.userId
             const userDeleted = await usersService.deleteUserById(id);
             if(!userDeleted)
             {
@@ -83,13 +85,7 @@ class UserController {
         try
         {
             const updates = req.body;
-            if(!userHelper.allFieldsFilledValidator(updates))
-            {
-                const error = new Error("Missing required fields");
-                error.status = 400;
-                throw error;
-            }
-            const id = Number(req.params.id);
+            const id = req.user.userId;
             const result =  await usersService.patchUserById(updates, id);
             if(!result)
             {
@@ -109,13 +105,7 @@ class UserController {
         try
         {
             const updates = req.body;
-            if(!userHelper.allFieldsFilledValidator(updates))
-            {
-                const error = new Error("Missing required fields");
-                error.status = 400;
-                throw error;
-            }
-            const id = Number(req.params.id);
+            const id = req.user.userId;
             const result = await usersService.putUserById(updates, id);
             if(!result)
             {

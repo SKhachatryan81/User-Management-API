@@ -18,8 +18,14 @@ export default function ( sequelize )
         name: DataTypes.STRING,
         email: DataTypes.STRING,
         age: DataTypes.INTEGER,
-        occupation: DataTypes.STRING,
         username: DataTypes.STRING,
+        password: DataTypes.STRING,
+        failedAttempts: DataTypes.INTEGER,
+        lockedUntil: {
+            type: DataTypes.DATE,
+            allowNull: true
+        }
+
     }, {
         tableName: "users", 
         timestamps: false,

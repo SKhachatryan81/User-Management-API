@@ -1,37 +1,28 @@
 import express from "express";
 import UserController from "../controllers/user.controller.js";
 import userValidator from "../middleware/user.validator.js";
+import authValidator from "../middleware/auth.validator.js";
 
-const usersRouter = express.Router();
+const userRouter = express.Router();
 
-usersRouter.get("/", UserController.getAllUsers);
-usersRouter.get("/:id",
-    userValidator.properParameters,
+userRouter.get("/", UserController.getAllUsers);
+userRouter.get("/me",
     UserController.getUserById
 );
 
-usersRouter.post("/", 
-    userValidator.allFieldsFilledValidator,
-    userValidator.uniqueValidator,
-    UserController.postNewUser
-);
-
-usersRouter.delete("/:id",
-    userValidator.properParameters,
+userRouter.delete("/me",
     UserController.deleteUserById
 );
 
-usersRouter.patch("/:id",
-    userValidator.properParameters,
+userRouter.patch("/me",
     userValidator.allFieldsEmptyValidator,
     UserController.patchUserById
 );
 
-usersRouter.put("/:id",
-    userValidator.properParameters,
+userRouter.put("/me",
     userValidator.allFieldsFilledValidator,
-    userValidator.uniqueValidator,
+    authValidator.uniqueAuth,
     UserController.putUserById
 );
 
-export default usersRouter;
+export default userRouter;
