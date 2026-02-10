@@ -20,6 +20,8 @@ app.use(tokenValidator);
 app.use("/api/users", usersRouter);
 app.use("/api/posts", postsRouter);
 
+// app.use("/api/auth/refresh", )
+
 
 app.use((req, res, next) => {
     const error = new Error(`Route ${req.originalUrl} not found`);

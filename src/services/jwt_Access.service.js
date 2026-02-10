@@ -1,16 +1,16 @@
 import jwt from "jsonwebtoken"
 
-class JWTService {
+class JWTAccess {
 
-    sign(id)
+    create(id)
     {
-        return jwt.sign({userId: id}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRES_IN});
+        return jwt.sign({userId: id}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_ACCESS_EXPIRES_IN});
     }
 
     verify(token)
     {
         try{
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
             return decoded;
         }catch(err)
         {
@@ -22,4 +22,4 @@ class JWTService {
 
 }
 
-export default new JWTService();
+export default new JWTAccess();

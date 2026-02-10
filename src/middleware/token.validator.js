@@ -1,4 +1,4 @@
-import jwtService from "../services/jwt.service.js";
+import jwtAccess from "../services/jwt_Access.service.js";
 
 export function tokenValidator(req, res, next)
 {
@@ -18,7 +18,7 @@ export function tokenValidator(req, res, next)
             error.status = 401;
             throw error;
         }
-        const decoded = jwtService.verify(token); 
+        const decoded = jwtAccess.verify(token); 
 
         req.user = decoded;
         return next()

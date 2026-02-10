@@ -24,8 +24,8 @@ export default function ( sequelize )
         lockedUntil: {
             type: DataTypes.DATE,
             allowNull: true
-        }
-
+        },
+        refreshToken: DataTypes.STRING
     }, {
         tableName: "users", 
         timestamps: false,
