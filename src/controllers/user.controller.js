@@ -85,8 +85,9 @@ class UserController {
         try
         {
             const updates = req.body;
-            const id = req.user.userId;
-            const result =  await usersService.patchUserById(updates, id);
+            const userId = req.user.userId;
+            // console.log(req.user);
+            const result =  await usersService.patchUserById(updates, userId);
             if(!result)
             {
                 const error = new Error("Failed to patch");

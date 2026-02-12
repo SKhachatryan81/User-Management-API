@@ -6,11 +6,24 @@ class JWTRefresh {
 
     async create(id)
     {
-        const token = jwt.sign({userId: id}, process.env.JWT_REFRESH_SECRET, {expiresIn: process.env.JWT_REFRESH_EXPIRES_IN});
-        const user = await db.userModel.findByPk(id)
-        user.refreshToken = token;
-        await user.save();
-        return token;
+        try{
+            const token = jwt.sign({userId: id}, process.env.JWT_REFRESH_SECRET, {expiresIn: process.env.JWT_REFRESH_EXPIRES_IN});
+            const user = await db.userModel.findByPk(id)
+            if(!user)
+            {
+                const error = new Error("user not found");
+                error.status = 404;
+                throw error;
+            }
+            user.refreshToken = token;
+            await user.save();
+            return token;
+        }catch(err)
+        {
+            const error = new Error("Failed to create a refresh token");
+            error.status = 500;
+            throw error;
+        }
     }
 
     verify(refreshToken)
@@ -53,21 +66,33 @@ class JWTRefresh {
 
     async rotate(refreshToken)
     {
-        const decoded = this.verify(refreshToken);
-        const userId = decoded.userId;
-        const user = await db.userModel.findByPk(userId);
+        try{
+            const decoded = this.verify(refreshToken);
+            const userId = decoded.userId;
+            const user = await db.userModel.findByPk(userId);
 
-        if(!user || refreshToken !== user.refreshToken)
+            if(!user || refreshToken !== user.refreshToken)
+            {
+                const error = new Error("Refresh token revoked");
+                error.status = 401;
+                throw error;
+            }
+            await this.revoke(refreshToken);
+            const newRefreshToken = await this.create(userId);
+            user.refreshToken = newRefreshToken;
+            await user.save();
+            
+            const newAccessToken = jwt_AccessService.create(userId);
+
+            return {accessToken: newAccessToken, refreshToken: newRefreshToken};
+        }catch(err)
         {
-            const error = new Error("Refresh token revoked");
+            console.error(err);
+            const error = new Error(`Invalid refresh token: ${err.message}`);
             error.status = 401;
             throw error;
+
         }
-
-        const newRefreshToken = this.create(userId);
-        const newAccessToken = jwt_AccessService.create(userId);
-
-        return {accessToken: newAccessToken, refreshToken: newRefreshToken};
     }
     
 }

@@ -4,7 +4,7 @@ class JWTAccess {
 
     create(id)
     {
-        return jwt.sign({userId: id}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_ACCESS_EXPIRES_IN});
+        return jwt.sign({userId: id}, process.env.JWT_ACCESS_SECRET, {expiresIn: process.env.JWT_ACCESS_EXPIRES_IN});
     }
 
     verify(token)

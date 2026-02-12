@@ -4,7 +4,7 @@ import postsRouter from "./src/routes/post.routes.js";
 import authRouter from "./src/routes/auth.routes.js";
 import { db } from "./src/config/index.js";
 import { globalErrorHandler } from "./src/error-handlers/globalErrorHandler.js";
-import { tokenValidator } from "./src/middleware/token.validator.js";
+import tokenValidator from "./src/middleware/token.validator.js";
 
 
 
@@ -16,11 +16,10 @@ db.sequelize.sync({alter: true}).then();
 
 app.use("/api/auth", authRouter);
 
-app.use(tokenValidator);
-app.use("/api/users", usersRouter);
-app.use("/api/posts", postsRouter);
+app.use("/api/users", tokenValidator.accessTokenValidator, usersRouter);
+app.use("/api/posts", tokenValidator.accessTokenValidator, postsRouter);
 
-// app.use("/api/auth/refresh", )
+
 
 
 app.use((req, res, next) => {
